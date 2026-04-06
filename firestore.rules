@@ -82,10 +82,14 @@ service cloud.firestore {
     }
 
     function isValidUser(data) {
-      return data.keys().hasAll(['uid', 'name', 'whatsapp', 'role', 'verified', 'createdAt']) &&
+      let requiredFields = ['uid', 'name', 'whatsapp', 'role', 'verified', 'createdAt'];
+      let allowedFields = ['uid', 'name', 'whatsapp', 'role', 'verified', 'createdAt', 'email', 'preferences'];
+      return data.keys().hasAll(requiredFields) &&
+             data.keys().hasOnly(allowedFields) &&
              data.uid is string && data.uid.size() > 0 &&
              data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
-             data.whatsapp is string && data.whatsapp.size() >= 8 && data.whatsapp.size() < 20 &&
+             data.whatsapp is string && (data.whatsapp.size() == 0 || (data.whatsapp.size() >= 8 && data.whatsapp.size() < 20)) &&
+             (!('email' in data) || isValidEmail(data.email)) &&
              data.role in ['admin', 'client'] &&
              data.verified is bool &&
              data.createdAt is timestamp;

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { auth, db, googleProvider } from "../firebase";
 import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -50,7 +50,7 @@ export default function Login() {
           email: user.email || "",
           role: "client",
           verified: false,
-          createdAt: new Date().toISOString(),
+          createdAt: serverTimestamp(),
         });
         toast.success("¡Bienvenido! Por favor completa tu número de WhatsApp.");
         navigate("/profile");
@@ -78,7 +78,7 @@ export default function Login() {
           email: data.email,
           role: "client",
           verified: true, // Simulated verification
-          createdAt: new Date().toISOString(),
+          createdAt: serverTimestamp(),
         });
         toast.success("Cuenta creada con éxito.");
       } else {

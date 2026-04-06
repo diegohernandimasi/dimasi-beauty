@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../App";
 import { db, auth } from "../firebase";
 import { appointmentService } from "../services/appointmentService";
-import { collection, query, where, getDocs, doc, updateDoc, orderBy } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, updateDoc, orderBy, serverTimestamp } from "firebase/firestore";
 import { Appointment, User } from "../types";
 import { formatCurrency, cn } from "../lib/utils";
 import { format, isAfter, parseISO } from "date-fns";
@@ -63,7 +63,7 @@ export default function Profile() {
     try {
       await updateDoc(doc(db, "appointments", id), {
         status: "cancelled",
-        updatedAt: new Date().toISOString(),
+        updatedAt: serverTimestamp(),
       });
       toast.success("Turno cancelado.");
     } catch (error) {
@@ -145,7 +145,7 @@ export default function Profile() {
             </div>
             <div className="flex items-center gap-2 text-neutral-600">
               <Calendar className="w-5 h-5 text-pink-500" />
-              <span className="font-medium">Miembro desde {format(new Date(user.createdAt), "MMMM yyyy", { locale: es })}</span>
+              <span className="font-medium">Miembro desde {format(user.createdAt?.toDate ? user.createdAt.toDate() : new Date(user.createdAt), "MMMM yyyy", { locale: es })}</span>
             </div>
           </div>
 

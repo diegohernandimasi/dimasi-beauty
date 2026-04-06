@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState, createContext, useContext } from "react";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp, onSnapshot } from "firebase/firestore";
 import { auth, db } from "./firebase";
 import { User } from "./types";
 import Layout from "./components/Layout";
@@ -27,42 +27,58 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    let unsubscribeUser: (() => void) | null = null;
+
+    const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (unsubscribeUser) {
+        unsubscribeUser();
+        unsubscribeUser = null;
+      }
+
       if (firebaseUser) {
-        const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data() as User;
-          // Ensure admin role for the specified email
-          if (firebaseUser.email === "mariaagustinadimasi@gmail.com" && userData.role !== "admin") {
-            await updateDoc(doc(db, "users", firebaseUser.uid), { role: "admin" });
-            userData.role = "admin";
+        // Listen to user document changes
+        const userRef = doc(db, "users", firebaseUser.uid);
+        unsubscribeUser = onSnapshot(userRef, async (docSnap) => {
+          if (docSnap.exists()) {
+            const userData = docSnap.data() as User;
+            // Ensure admin role for the specified email
+            if (firebaseUser.email === "mariaagustinadimasi@gmail.com" && userData.role !== "admin") {
+              await updateDoc(userRef, { role: "admin" });
+              // The next snapshot will have the updated role
+            } else {
+              setUser(userData);
+              setLoading(false);
+            }
+          } else {
+            // New user logic
+            const role = firebaseUser.email === "mariaagustinadimasi@gmail.com" ? "admin" : "client";
+            const newUser: User = {
+              uid: firebaseUser.uid,
+              name: firebaseUser.displayName || "Usuario",
+              whatsapp: "",
+              email: firebaseUser.email || "",
+              role: role as "admin" | "client",
+              verified: false,
+              createdAt: serverTimestamp(),
+            };
+            if (role === "admin") {
+              await setDoc(userRef, newUser);
+            } else {
+              setUser(newUser);
+              setLoading(false);
+            }
           }
-          setUser(userData);
-        } else {
-          // New user from Google or other provider
-          const role = firebaseUser.email === "mariaagustinadimasi@gmail.com" ? "admin" : "client";
-          const newUser: User = {
-            uid: firebaseUser.uid,
-            name: firebaseUser.displayName || "Usuario",
-            whatsapp: "",
-            email: firebaseUser.email || "",
-            role: role as "admin" | "client",
-            verified: false,
-            createdAt: new Date().toISOString(),
-          };
-          // If it's the admin, we can save it immediately
-          if (role === "admin") {
-            await setDoc(doc(db, "users", firebaseUser.uid), newUser);
-          }
-          setUser(newUser);
-        }
+        });
       } else {
         setUser(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeUser) unsubscribeUser();
+    };
   }, []);
 
   const isAdmin = user?.role === "admin";

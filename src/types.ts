@@ -28,7 +28,7 @@ export interface User {
   role: "admin" | "client";
   preferences?: string;
   verified: boolean;
-  createdAt: string;
+  createdAt: any;
 }
 
 export interface Appointment {
@@ -47,8 +47,8 @@ export interface Appointment {
   price: number;
   location: "salon" | "home";
   notes?: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: any;
+  updatedAt: any;
 }
 
 export interface AvailabilitySlot {

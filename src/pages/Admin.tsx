@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Routes, Route, Link, useLocation } from "react-router-dom";
 import { db } from "../firebase";
 import { appointmentService } from "../services/appointmentService";
-import { collection, query, getDocs, doc, updateDoc, addDoc, deleteDoc, orderBy, limit } from "firebase/firestore";
+import { collection, query, getDocs, doc, updateDoc, addDoc, deleteDoc, orderBy, limit, serverTimestamp } from "firebase/firestore";
 import { Appointment, Service, Professional, User } from "../types";
 import { INITIAL_SERVICES, INITIAL_PROFESSIONALS } from "../constants";
 import { formatCurrency, cn } from "../lib/utils";
@@ -170,7 +170,7 @@ function Agenda() {
 
   const updateStatus = async (id: string, status: string) => {
     try {
-      await updateDoc(doc(db, "appointments", id), { status, updatedAt: new Date().toISOString() });
+      await updateDoc(doc(db, "appointments", id), { status, updatedAt: serverTimestamp() });
       setAppointments(appointments.map(a => a.id === id ? { ...a, status: status as any } : a));
       toast.success(`Turno marcado como ${status}`);
     } catch (error) {
