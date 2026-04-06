@@ -1,0 +1,90 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "whatsapp": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "client"] },
+        "verified": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "whatsapp", "role", "verified"]
+    },
+    "Service": {
+      "title": "Service",
+      "description": "Beauty service definition",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "durationMinutes": { "type": "integer" },
+        "price": { "type": "number" },
+        "category": { "type": "string", "enum": ["manicura", "peluqueria"] },
+        "color": { "type": "string" }
+      },
+      "required": ["id", "name", "durationMinutes", "price", "category"]
+    },
+    "Professional": {
+      "title": "Professional",
+      "description": "Staff member information",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "specialties": { "type": "array", "items": { "type": "string" } },
+        "phone": { "type": "string" },
+        "workingHours": { "type": "object" }
+      },
+      "required": ["id", "name", "specialties", "workingHours"]
+    },
+    "Appointment": {
+      "title": "Appointment",
+      "description": "Booking record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "clientId": { "type": "string" },
+        "clientName": { "type": "string" },
+        "clientWhatsapp": { "type": "string" },
+        "serviceId": { "type": "string" },
+        "serviceName": { "type": "string" },
+        "professionalId": { "type": "string" },
+        "professionalName": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "startTime": { "type": "string" },
+        "endTime": { "type": "string" },
+        "status": { "type": "string", "enum": ["confirmed", "cancelled", "completed"] },
+        "price": { "type": "number" },
+        "location": { "type": "string", "enum": ["salon", "home"] },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "clientId", "serviceId", "date", "startTime", "endTime", "status", "price", "location"]
+    }
+  },
+  "firestore": {
+    "users/{uid}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "services/{id}": {
+      "schema": "Service",
+      "description": "Available services"
+    },
+    "professionals/{id}": {
+      "schema": "Professional",
+      "description": "Staff members"
+    },
+    "appointments/{id}": {
+      "schema": "Appointment",
+      "description": "Booking records"
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "name": "DIMASI.BEAUTY",
+  "description": "Gestión de turnos para peluquería y manicura. Reserva fácil, recordatorios por WhatsApp y panel de administración.",
+  "requestFramePermissions": ["geolocation"]
+}
