@@ -64,8 +64,18 @@ export default function App() {
             if (role === "admin") {
               await setDoc(userRef, newUser);
             } else {
-              setUser(newUser);
-              setLoading(false);
+              // For new clients, we don't set the user state here if they are in the middle of registering
+              // Login.tsx will handle the setDoc and App.tsx will pick it up in the next snapshot
+              // However, if they log in via Google, we DO want to set it so they can see the profile page
+              if (firebaseUser.providerData.some(p => p.providerId === "google.com")) {
+                setUser(newUser);
+                setLoading(false);
+              } else {
+                // If they are registering with email, we keep user as null so Login.tsx can finish its work
+                // But we MUST set loading to false so Login.tsx can continue its UI flow
+                setUser(null);
+                setLoading(false);
+              }
             }
           }
         });

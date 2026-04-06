@@ -87,13 +87,15 @@ export default function Login() {
       }
       navigate("/");
     } catch (error: any) {
-      console.error(error);
+      console.error("Registration Error:", error);
       if (error.code === "auth/email-already-in-use") {
         toast.error("El email ya está en uso.");
       } else if (error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
         toast.error("Credenciales inválidas.");
+      } else if (error.code === "permission-denied") {
+        toast.error("Error de permisos en la base de datos.");
       } else {
-        toast.error("Ocurrió un error.");
+        toast.error(`Error: ${error.message || "Ocurrió un error."}`);
       }
     } finally {
       setLoading(false);
