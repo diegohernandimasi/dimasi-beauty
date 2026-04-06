@@ -33,14 +33,14 @@ export default function App() {
         if (userDoc.exists()) {
           const userData = userDoc.data() as User;
           // Ensure admin role for the specified email
-          if (firebaseUser.email === "diegohernandimasi@gmail.com" && userData.role !== "admin") {
+          if (firebaseUser.email === "mariaagustinadimasi@gmail.com" && userData.role !== "admin") {
             await updateDoc(doc(db, "users", firebaseUser.uid), { role: "admin" });
             userData.role = "admin";
           }
           setUser(userData);
         } else {
           // New user from Google or other provider
-          const role = firebaseUser.email === "diegohernandimasi@gmail.com" ? "admin" : "client";
+          const role = firebaseUser.email === "mariaagustinadimasi@gmail.com" ? "admin" : "client";
           const newUser: User = {
             uid: firebaseUser.uid,
             name: firebaseUser.displayName || "Usuario",

@@ -165,7 +165,7 @@ export default function Home() {
           <div>
             <h4 className="font-bold text-neutral-900">Contacto</h4>
             <p className="text-neutral-500 text-sm">11 3503-1089</p>
-            <p className="text-neutral-500 text-sm">diegohernandimasi@gmail.com</p>
+            <p className="text-neutral-500 text-sm">mariaagustinadimasi@gmail.com</p>
           </div>
         </div>
       </section>
